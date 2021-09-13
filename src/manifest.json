@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Selecty CRM",
+  "description": "Selecty CRM",
+  "version": "1.33",
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts" : [{
+    "matches" : [ "*://*.hh.ru/resume/*"],
+    "js" : ["checkers/infoChecker.js"]
+  }, {
+    "matches" : [ "*://*.hh.ru/*"],
+    "js" : ["checkers/versionChecker.js"]
+  }],
+  "permissions": [
+    "*://*/*",
+    "tabs", 
+    "activeTab",
+    "storage"
+  ]
+}
