@@ -146,6 +146,13 @@ async function getStorageKey(key) {
   })
 }
 
+
+async function getIgnoreInfoCheckerFn() {
+  let ignoreInfoCheckerFn = await getStorageKey('getIgnoreInfoCheckerFn');
+
+  return !!ignoreInfoCheckerFn;
+}
+
 async function getWorker() {
   let worker = await getStorageKey('worker');
 
@@ -397,7 +404,9 @@ async function _checkUserInfo(workerId) {
 
 async function start() {
   let workerId = await getWorker();
-  // let ignoreInfoCheckerFn = await getIgnoreInfoCheckerFn();
+  let ignoreInfoCheckerFn = await getIgnoreInfoCheckerFn();
+
+  if(ignoreInfoCheckerFn) return;
 
   try {
     await _checkUserInfo(workerId);

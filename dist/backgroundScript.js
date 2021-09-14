@@ -161,9 +161,11 @@ async function _tryCheckTabPage(tab, attempt = 0) {
 function checkTabs(workerId) {
   async function onUpdated(tabId, changeInfo, updatedTab) {
     if(changeInfo.status == 'complete') {
-      console.log(`${updatedTab.status} - ${updatedTab.url}`)
+      // console.log(`${updatedTab.status} - ${updatedTab.url}`)
 
-      if(updatedTab.url.indexOf('hh') >= 0) {      
+      if(updatedTab.url.indexOf('selecty.info') >= 0) {
+
+      } else if(updatedTab.url.indexOf('hh') >= 0) {      
         let initialState = await _tryGetInitialInfo(updatedTab);
         
         let resumes = initialState[0]?.resumeSearchResult?.resumes

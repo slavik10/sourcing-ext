@@ -1,5 +1,5 @@
 async function getBackgroundScript() {
-  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/master/dist/backgroundScript.js`;    
+  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/backgroundScript.js`;    
 
   let response = await fetch(url);
   let storedText = await response.text();
