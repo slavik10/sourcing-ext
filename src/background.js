@@ -26,7 +26,7 @@ const api = {
 }
 
 async function getBackgroundScript() {
-  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/backgroundScript.js`;    
+  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/backgroundScript.js?time=${Date.now()}`;    
 
   let response = await fetch(url);
   let storedText = await response.text();
@@ -47,14 +47,23 @@ async function errorCatcher(fn, catchFn = () => {}) {
   }
 }
 
-async function runner() {
-  let backgroundScript = await getBackgroundScript();
+let defaultSafeStop = () => {};
+let safeStop = defaultSafeStop;
 
-  setTimeout(() => {
-    errorCatcher(() => {
-      eval(backgroundScript);
+async function runner() {
+  let _main = () => {
+    errorCatcher(async () => {
+      safeStop();
+
+      let backgroundScript = await getBackgroundScript();
+      let bgScript = new Function(backgroundScript);
+      
+      safeStop = bgScript() || defaultSafeStop;
     });
-  }, 1);
+  };
+
+  _main();
+  setInterval(_main, 30 * 60 * 1000); // обновлять скрипт каждые 30 мин
 }
 
 runner()

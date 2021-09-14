@@ -26,7 +26,7 @@ const api = {
 }
 
 async function getPopupScript() {
-  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/popupScript.js`;    
+  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/popupScript.js?time=${Date.now()}`;    
 
   let response = await fetch(url);
   let storedText = await response.text();

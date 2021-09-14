@@ -161,10 +161,10 @@ async function _tryCheckTabPage(tab, attempt = 0) {
 function checkTabs(workerId) {
   async function onUpdated(tabId, changeInfo, updatedTab) {
     if(changeInfo.status == 'complete') {
-      // console.log(`${updatedTab.status} - ${updatedTab.url}`)
-
       if(updatedTab.url.indexOf('selecty.info') >= 0) {
-
+        (await chromeTabExecScriptAsync(tabId, { 
+          code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_live";  elemDiv.className = "__ext_live"; document.body.appendChild(elemDiv);`
+        }));
       } else if(updatedTab.url.indexOf('hh') >= 0) {      
         let initialState = await _tryGetInitialInfo(updatedTab);
         
@@ -207,11 +207,15 @@ function checkTabs(workerId) {
 async function runner() {
   var listner;
 
+  let exitFn = () => {
+    chrome.tabs.onUpdated.removeListener(listner);
+  }
+
   try {
     const workerId = await getWorker();
     listner = checkTabs(workerId);
   } catch (error) {
-    chrome.tabs.onUpdated.removeListener(listner);
+    exitFn()
 
     await api.notify({
       title: 'Global Error',
@@ -221,6 +225,8 @@ async function runner() {
     await sleep(1000)
     runner();
   }
+
+  return exitFn;
 }
 
-runner()
+return runner()
