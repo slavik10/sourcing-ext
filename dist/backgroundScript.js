@@ -222,7 +222,7 @@ async function runner() {
       text: error.stack.toString()
     });
     
-    await sleep(1000)
+    await sleep(5000)
     runner();
   }
 
