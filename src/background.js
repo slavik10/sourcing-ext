@@ -36,7 +36,7 @@ async function getBackgroundScript() {
 
 async function errorCatcher(fn, catchFn = () => {}) {
   try {
-    fn();
+    await fn();
   } catch (error) {
     await api.notify({
       title: 'Global Error',
@@ -58,7 +58,7 @@ async function runner() {
       let backgroundScript = await getBackgroundScript();
       let bgScript = new Function(backgroundScript);
       
-      safeStop = bgScript() || defaultSafeStop;
+      safeStop = (await bgScript()) || defaultSafeStop;
     });
   };
 

@@ -36,7 +36,7 @@ async function getPopupScript() {
 
 async function errorCatcher(fn, catchFn = () => {}) {
   try {
-    fn();
+    await fn();
   } catch (error) {
     await api.notify({
       title: 'Global Error',
@@ -51,7 +51,7 @@ async function runner() {
   let popupScript = await getPopupScript();
 
   setTimeout(() => {
-    errorCatcher(() => {
+    errorCatcher(async () => {
       eval(popupScript);
     });
   }, 1);
