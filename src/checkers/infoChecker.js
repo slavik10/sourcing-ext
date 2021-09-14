@@ -397,6 +397,7 @@ async function _checkUserInfo(workerId) {
 
 async function start() {
   let workerId = await getWorker();
+  // let ignoreInfoCheckerFn = await getIgnoreInfoCheckerFn();
 
   try {
     await _checkUserInfo(workerId);

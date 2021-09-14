@@ -12,14 +12,12 @@
   "content_scripts" : [{
     "matches" : [ "*://*.hh.ru/resume/*"],
     "js" : ["checkers/infoChecker.js"]
-  }, {
-    "matches" : [ "*://*.hh.ru/*"],
-    "js" : ["checkers/versionChecker.js"]
   }],
   "permissions": [
     "*://*/*",
     "tabs", 
     "activeTab",
     "storage"
-  ]
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
