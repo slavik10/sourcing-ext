@@ -146,10 +146,8 @@ async function getStorageKey(key) {
   })
 }
 
-
 async function getIgnoreInfoCheckerFn() {
   let ignoreInfoCheckerFn = await getStorageKey('getIgnoreInfoCheckerFn');
-
   return !!ignoreInfoCheckerFn;
 }
 
