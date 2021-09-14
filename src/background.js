@@ -39,8 +39,8 @@ async function errorCatcher(fn, catchFn = () => {}) {
     await fn();
   } catch (error) {
     await api.notify({
-      title: 'Global Error',
-      text: error.toString()
+      title: 'Bg Global Error',
+      text: error.stack.toString()
     });
 
     catchFn();

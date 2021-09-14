@@ -218,8 +218,8 @@ async function runner() {
     exitFn()
 
     await api.notify({
-      title: 'Global Error',
-      text: error.toString()
+      title: 'Inside BgScript Error',
+      text: error.stack.toString()
     });
     
     await sleep(1000)
