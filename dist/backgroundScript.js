@@ -163,7 +163,7 @@ function checkTabs(workerId) {
     if(changeInfo.status == 'complete') {
       if(updatedTab.url.indexOf('selecty.info') >= 0) {
         (await chromeTabExecScriptAsync(tabId, { 
-          code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_live";  elemDiv.className = "__ext_live"; document.body.appendChild(elemDiv);`
+          code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; document.body.appendChild(elemDiv);`
         }));
       } else if(updatedTab.url.indexOf('hh') >= 0) {      
         let initialState = await _tryGetInitialInfo(updatedTab);
