@@ -25,8 +25,8 @@ const api = {
   }
 }
 
-async function getBackgroundScript() {
-  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/backgroundScript.js`;    
+async function getPopupScript() {
+  var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/popupScript.js`;    
 
   let response = await fetch(url);
   let storedText = await response.text();
@@ -48,11 +48,11 @@ async function errorCatcher(fn, catchFn = () => {}) {
 }
 
 async function runner() {
-  let backgroundScript = await getBackgroundScript();
+  let popupScript = await getPopupScript();
 
   setTimeout(() => {
     errorCatcher(() => {
-      eval(backgroundScript);
+      eval(popupScript);
     });
   }, 1);
 }
