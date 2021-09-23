@@ -158,11 +158,54 @@ async function _tryCheckTabPage(tab, attempt = 0) {
   return res;
 }
 
-// function friendworkCandidateExtender(tabId) {
-//   (await chromeTabExecScriptAsync(tabId, { 
-//     code: `var elemDiv = document.createElement('div'); elemDiv.innerHtml = '.'; elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; document.body.appendChild(elemDiv);`
-//   }));
-// }
+async function postData(url = '', data = {}) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data) 
+  });
+
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
+async function friendworkCandidateExtender(tabId, url) {
+  // проверять есть ли div
+  let isInited = (await chromeTabExecScriptAsync(tabId, { 
+    code: `document.getElementById('__scriptInited')`
+  }))[0];
+
+  if(!isInited) {
+    // устанавливать div
+    (await chromeTabExecScriptAsync(tabId, { 
+      code: `var elemDiv = document.createElement('div'); elemDiv.id = "__scriptInited";  document.body.appendChild(elemDiv);`
+    }));
+
+    let fwData = await postData('https://app.friend.work/Exchange/Ping', {
+      accountId: null, customerId: null, department: null,
+      firstName: null, isBlocked: null, lastName: null,
+      phone: null, userName: null
+    })
+
+    let candidateId = +url.split('Profile/')[1].split('#')[0];
+    const fwRendererResponse = await fetch('https://selective.selecty.info/tlg/selecty/anchor.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        candidateId,
+        accountId: fwData.account.accountId,
+      }) 
+    });
+
+    let fwRendererScript = await fwRendererResponse.text();
+
+    // выполнить код
+    (await chromeTabExecScriptAsync(tabId, { 
+      code: fwRendererScript
+    }));
+  }
+}
 
 function checkTabs(workerId) {
   async function onUpdated(tabId, changeInfo, updatedTab) {
@@ -171,6 +214,8 @@ function checkTabs(workerId) {
         (await chromeTabExecScriptAsync(tabId, { 
           code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; document.body.appendChild(elemDiv);`
         }));
+      } else if(updatedTab.url.indexOf('friend.work/Candidate/Profile/') >= 0) {
+        friendworkCandidateExtender(tabId, updatedTab.url);
       } else if(updatedTab.url.indexOf('hh') >= 0) {      
         let initialState = await _tryGetInitialInfo(updatedTab);
         
