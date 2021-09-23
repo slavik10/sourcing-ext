@@ -158,11 +158,11 @@ async function _tryCheckTabPage(tab, attempt = 0) {
   return res;
 }
 
-function friendworkCandidateExtender(tabId) {
-  (await chromeTabExecScriptAsync(tabId, { 
-    code: `var elemDiv = document.createElement('div'); elemDiv.innerHtml = '.'; elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; document.body.appendChild(elemDiv);`
-  }));
-}
+// function friendworkCandidateExtender(tabId) {
+//   (await chromeTabExecScriptAsync(tabId, { 
+//     code: `var elemDiv = document.createElement('div'); elemDiv.innerHtml = '.'; elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; document.body.appendChild(elemDiv);`
+//   }));
+// }
 
 function checkTabs(workerId) {
   async function onUpdated(tabId, changeInfo, updatedTab) {
@@ -171,8 +171,6 @@ function checkTabs(workerId) {
         (await chromeTabExecScriptAsync(tabId, { 
           code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; document.body.appendChild(elemDiv);`
         }));
-      } else if(updatedTab.url.indexOf('friend.work/Candidate/Profile/') >= 0) {
-        friendworkCandidateExtender(tabId);
       } else if(updatedTab.url.indexOf('hh') >= 0) {      
         let initialState = await _tryGetInitialInfo(updatedTab);
         
