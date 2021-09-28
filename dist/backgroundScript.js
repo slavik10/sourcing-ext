@@ -98,6 +98,13 @@ async function _getStorage(key) {
   })
 }
 
+function getExtVersion() {
+  var manifestData = chrome.runtime.getManifest();
+  let apiVersion = manifestData.version;
+
+  return apiVersion;
+}
+
 async function getWorker() {
   let worker = await _getStorage('worker');
 
@@ -187,6 +194,8 @@ async function friendworkCandidateExtender(tabId, url) {
       firstName: null, isBlocked: null, lastName: null,
       phone: null, userName: null
     })
+    
+    let extVersion = getExtVersion();
 
     let candidateId = +url.split('Profile/')[1].split('#')[0];
     const fwRendererResponse = await fetch('https://selective.selecty.info/tlg/selecty/anchor.php', {
@@ -194,6 +203,7 @@ async function friendworkCandidateExtender(tabId, url) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         candidateId,
+        extVersion,
         accountId: fwData.account.accountId,
       }) 
     });
@@ -211,8 +221,10 @@ function checkTabs(workerId) {
   async function onUpdated(tabId, changeInfo, updatedTab) {
     if(changeInfo.status == 'complete') {
       if(updatedTab.url.indexOf('selecty.info') >= 0) {
+        let extVersion = getExtVersion();
+
         (await chromeTabExecScriptAsync(tabId, { 
-          code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; document.body.appendChild(elemDiv);`
+          code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; elemDiv.setAttribute("extVersion", "${extVersion}"); document.body.appendChild(elemDiv);`
         }));
       } else if(updatedTab.url.indexOf('friend.work/Candidate/Profile/') >= 0) {
         friendworkCandidateExtender(tabId, updatedTab.url);
