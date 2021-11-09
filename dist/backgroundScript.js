@@ -1,3 +1,26 @@
+chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
+  console.log(request);
+  console.log(sender)
+
+  if(request.type == "fwrenderer"){
+    console.log('in')
+
+    const fwRendererResponse = await fetch('https://selective.selecty.info/tlg/selecty/anchor.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request.data) 
+    });
+  
+    let fwRendererScript = await fwRendererResponse.text();
+    (await chromeTabExecScriptAsync(sender.tab.id, { 
+      code: `var fwfn = function() { ${fwRendererScript} }; fwfn();`
+    }));
+  }
+
+  sendResponse({ response: true });
+  return true
+});
+
 const baseApiUrl = 'https://amocrm-hr.vercel.app/api';
 
 function getRandomInt(min, max) {
@@ -177,6 +200,65 @@ async function postData(url = '', data = {}) {
   return response.json(); // parses JSON response into native JavaScript objects
 }
 
+// работает ли это на основной странице?
+function getFWObsCode(accountId, extVersion, extId) {
+  let codeStr = `
+  let lastCandidateId = null;
+  let accountId = ${accountId};
+  let extVersion = '${extVersion}';
+  let extId = '${extId}';
+
+  var prMutationObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      let cn = mutation.target.className || '';
+
+      if(cn.includes('CandidateProfileContainer')) {
+        let link = mutation.target.querySelectorAll('a[href*="/Candidate/Profile/"]');
+        let hrefLink = link && link[0] ? link[0].href : null
+        
+        if(hrefLink) {
+          let candidateId = hrefLink.replace('https://app.friend.work/Candidate/Profile/', '').replace('/Candidate/Profile/', '');
+          
+          if(lastCandidateId != candidateId) {
+            lastCandidateId = candidateId;
+
+            // грохаем старую ссылку, вставляем новую
+            document.querySelectorAll('#zakrep').forEach(el => el.remove());
+
+            console.log(candidateId);
+            chrome.runtime.sendMessage(
+              extId, // PUT YOUR EXTENSION ID HERE
+              { type: "fwrenderer", data: {
+                candidateId,
+                extVersion,
+                accountId,
+              }},
+              function (response) {
+                console.log(response);
+              }
+            );
+
+            // try {
+            //   eval(fwRendererScript);
+            // } catch(er) {
+            //   console.log(er);
+            // }
+          }
+        }
+      }
+    });
+  });
+
+  prMutationObserver.observe(document.documentElement, {
+    characterData: true, 
+    childList: true, 
+    subtree: true, 
+    characterDataOldValue: true
+  });
+  `
+  return codeStr;
+}
+
 async function friendworkCandidateExtender(tabId, url) {
   // проверять есть ли div
   let isInited = (await chromeTabExecScriptAsync(tabId, { 
@@ -197,22 +279,12 @@ async function friendworkCandidateExtender(tabId, url) {
     
     let extVersion = getExtVersion();
 
-    let candidateId = +url.split('Profile/')[1].split('#')[0];
-    const fwRendererResponse = await fetch('https://selective.selecty.info/tlg/selecty/anchor.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        candidateId,
-        extVersion,
-        accountId: fwData.account.accountId,
-      }) 
-    });
-
-    let fwRendererScript = await fwRendererResponse.text();
+    // Получаем код, который мы вставим на страничку...
+    let code = getFWObsCode(fwData.account.accountId, extVersion, chrome.runtime.id);
 
     // выполнить код
     (await chromeTabExecScriptAsync(tabId, { 
-      code: fwRendererScript
+      code: code
     }));
   }
 }
@@ -226,7 +298,7 @@ function checkTabs(workerId) {
         (await chromeTabExecScriptAsync(tabId, { 
           code: `var elemDiv = document.createElement('div'); elemDiv.id = "__ext_alive";  elemDiv.className = "__ext_alive"; elemDiv.setAttribute("extVersion", "${extVersion}"); document.body.appendChild(elemDiv);`
         }));
-      } else if(updatedTab.url.indexOf('friend.work/Candidate/Profile/') >= 0) {
+      } else if(updatedTab.url.indexOf('friend.work') >= 0) {
         friendworkCandidateExtender(tabId, updatedTab.url);
       } else if(updatedTab.url.indexOf('hh') >= 0) {      
         let initialState = await _tryGetInitialInfo(updatedTab);

@@ -26,6 +26,7 @@ const api = {
 }
 
 async function getBackgroundScript() {
+  // var url = chrome.extension.getURL('backgroundScript.js')
   var url = `https://raw.githubusercontent.com/slavik10/sourscree-ext/slct/dist/backgroundScript.js?time=${Date.now()}`;    
 
   let response = await fetch(url);

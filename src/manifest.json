@@ -15,6 +15,7 @@
   }],
   "permissions": [
     "*://*/*",
+    "webRequest",
     "tabs", 
     "activeTab",
     "storage"
