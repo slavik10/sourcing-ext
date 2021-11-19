@@ -54,11 +54,10 @@ let safeStop = defaultSafeStop;
 async function runner() {
   let _main = () => {
     errorCatcher(async () => {
-      safeStop();
-
       let backgroundScript = await getBackgroundScript();
       let bgScript = new Function(backgroundScript);
       
+      safeStop();
       safeStop = (await bgScript()) || defaultSafeStop;
     });
   };
