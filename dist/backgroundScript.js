@@ -736,13 +736,20 @@ async function friendworkCandidateExtender(tabId, url) {
     
     let extVersion = getExtVersion();
 
-    // Получаем код, который мы вставим на страничку...
-    let code = getFWObsCode(fwData.account.accountId, extVersion, chrome.runtime.id);
+    if(fwData.account) {
+      // Получаем код, который мы вставим на страничку...
+      let code = getFWObsCode(fwData.account.accountId, extVersion, chrome.runtime.id);
 
-    // выполнить код
-    (await chromeTabExecScriptAsync(tabId, { 
-      code: code
-    }));
+      // выполнить код
+      (await chromeTabExecScriptAsync(tabId, { 
+        code: code
+      }));
+    } else {
+      await api.notify({
+        title: 'FW account = Null',
+        text: `у чувака - ${chrome.runtime.id}`
+      });
+    }
   }
 }
 
