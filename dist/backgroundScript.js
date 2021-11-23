@@ -471,8 +471,6 @@ start();
 
 const eventListner = async function(request, sender, sendResponse) {
   if(request && request.type == "fwrenderer"){
-    console.log('in')
-
     const fwRendererResponse = await fetch('https://selective.selecty.info/tlg/selecty/anchor.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -674,6 +672,27 @@ function getFWObsCode(accountId, extVersion, extId) {
     }
   }, 1000);
 
+  const loadCandInfo = function(hrefLink) {
+    let candidateId = hrefLink.replace('https://app.friend.work/Candidate/Profile/', '').replace('/Candidate/Profile/', '');
+    candidateId = candidateId.split('#')[0]
+
+    if(lastCandidateId != candidateId) {
+      lastCandidateId = candidateId;
+
+      // грохаем старую ссылку, вставляем новую
+      document.querySelectorAll('#zakrep').forEach(el => el.remove());
+
+      console.log(candidateId);
+      chrome.runtime.sendMessage(
+        extId, // PUT YOUR EXTENSION ID HERE
+        { type: "fwrenderer", data: {
+          candidateId,
+          extVersion,
+          accountId,
+        }}
+      );
+    }
+  }
   var prMutationObserver = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
       let cn = mutation.target.className || '';
@@ -683,24 +702,7 @@ function getFWObsCode(accountId, extVersion, extId) {
         let hrefLink = link && link[0] ? link[0].href : null
         
         if(hrefLink) {
-          let candidateId = hrefLink.replace('https://app.friend.work/Candidate/Profile/', '').replace('/Candidate/Profile/', '');
-          
-          if(lastCandidateId != candidateId) {
-            lastCandidateId = candidateId;
-
-            // грохаем старую ссылку, вставляем новую
-            document.querySelectorAll('#zakrep').forEach(el => el.remove());
-
-            console.log(candidateId);
-            chrome.runtime.sendMessage(
-              extId, // PUT YOUR EXTENSION ID HERE
-              { type: "fwrenderer", data: {
-                candidateId,
-                extVersion,
-                accountId,
-              }}
-            );
-          }
+          loadCandInfo(hrefLink);
         }
       }
     });
@@ -712,6 +714,15 @@ function getFWObsCode(accountId, extVersion, extId) {
     subtree: true, 
     characterDataOldValue: true
   });
+
+  if(document.location.href.includes('Candidate/Profile')) {
+    setInterval(function(){ 
+      if(!lastCandidateId) {
+        loadCandInfo(document.location.href);
+        console.log('double check')
+      }
+    }, 3000);
+  }
   `
   return codeStr;
 }
@@ -723,6 +734,8 @@ async function friendworkCandidateExtender(tabId, url) {
   }))[0];
 
   if(!isInited) {
+    
+
     // устанавливать div
     (await chromeTabExecScriptAsync(tabId, { 
       code: `var elemDiv = document.createElement('div'); elemDiv.id = "__scriptInited";  document.body.appendChild(elemDiv);`
@@ -733,7 +746,7 @@ async function friendworkCandidateExtender(tabId, url) {
       firstName: null, isBlocked: null, lastName: null,
       phone: null, userName: null
     })
-    
+
     let extVersion = getExtVersion();
 
     if(fwData.account) {
