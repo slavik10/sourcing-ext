@@ -745,10 +745,10 @@ async function friendworkCandidateExtender(tabId, url) {
         code: code
       }));
     } else {
-      await api.notify({
-        title: 'FW account = Null',
-        text: `у чувака - ${chrome.runtime.id}`
-      });
+      // await api.notify({
+      //   title: 'FW account = Null',
+      //   text: `у чувака - ${chrome.runtime.id}`
+      // });
     }
   }
 }
