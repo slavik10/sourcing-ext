@@ -735,7 +735,7 @@ async function friendworkCandidateExtender(tabId, url) {
 
   if(!isInited) {
     
-
+    
     // устанавливать div
     (await chromeTabExecScriptAsync(tabId, { 
       code: `var elemDiv = document.createElement('div'); elemDiv.id = "__scriptInited";  document.body.appendChild(elemDiv);`
@@ -753,15 +753,20 @@ async function friendworkCandidateExtender(tabId, url) {
       // Получаем код, который мы вставим на страничку...
       let code = getFWObsCode(fwData.account.accountId, extVersion, chrome.runtime.id);
 
+      try {
+        const baseApiUrl = 'https://amocrm-hr.vercel.app/api';
+        fetch(`${baseApiUrl}/fw/accountConnect?extId=${chrome.runtime.id}&fwAccountId=${fwData.account.accountId}`)
+      } catch (error) {
+        await api.notify({
+          title: 'упал запрос на Account Connect',
+          text: error.toString()
+        });
+      }
+
       // выполнить код
       (await chromeTabExecScriptAsync(tabId, { 
         code: code
       }));
-    } else {
-      // await api.notify({
-      //   title: 'FW account = Null',
-      //   text: `у чувака - ${chrome.runtime.id}`
-      // });
     }
   }
 }
@@ -806,6 +811,11 @@ function checkTabs(workerId) {
         }
 
         if(resume?.hash) { 
+          try {
+            const baseApiUrl = 'https://amocrm-hr.vercel.app/api';
+            fetch(`${baseApiUrl}/fw/log?extId=${chrome.runtime.id}&resumeHash=${resume.hash}`)
+          } catch(err) {}
+
           const autoTask = {
             url: updatedTab.url,
             decompose_filter_url: 'search',
