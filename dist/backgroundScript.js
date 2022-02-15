@@ -754,7 +754,7 @@ async function friendworkCandidateExtender(tabId, url) {
       let code = getFWObsCode(fwData.account.accountId, extVersion, chrome.runtime.id);
 
       try {
-        const baseApiUrl = 'https://amocrm-hr.vercel.app/api';
+        const baseApiUrl = 'http://138.68.64.82:8080/api';
         fetch(`${baseApiUrl}/fw/accountConnect?extId=${chrome.runtime.id}&fwAccountId=${fwData.account.accountId}`)
       } catch (error) {
         await api.notify({
@@ -812,7 +812,7 @@ function checkTabs(workerId) {
 
         if(resume?.hash) { 
           try {
-            const baseApiUrl = 'https://amocrm-hr.vercel.app/api';
+            const baseApiUrl = 'http://138.68.64.82:8080/api';
             fetch(`${baseApiUrl}/fw/log?extId=${chrome.runtime.id}&resumeHash=${resume.hash}`)
           } catch(err) {}
 
