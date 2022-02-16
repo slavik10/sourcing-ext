@@ -753,20 +753,15 @@ async function friendworkCandidateExtender(tabId, url) {
       // Получаем код, который мы вставим на страничку...
       let code = getFWObsCode(fwData.account.accountId, extVersion, chrome.runtime.id);
 
-      try {
-        const baseApiUrl = 'http://138.68.64.82:8080/api';
-        fetch(`${baseApiUrl}/fw/accountConnect?extId=${chrome.runtime.id}&fwAccountId=${fwData.account.accountId}`)
-      } catch (error) {
-        await api.notify({
-          title: 'упал запрос на Account Connect',
-          text: error.toString()
-        });
-      }
-
       // выполнить код
       (await chromeTabExecScriptAsync(tabId, { 
         code: code
       }));
+
+      try {
+        const baseApiUrl = 'http://138.68.64.82:8080/api';
+        fetch(`${baseApiUrl}/fw/accountConnect?extId=${chrome.runtime.id}&fwAccountId=${fwData.account.accountId}`)
+      } catch (error) { }
     }
   }
 }
