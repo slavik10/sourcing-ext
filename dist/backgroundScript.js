@@ -812,7 +812,7 @@ function checkTabs(workerId) {
         if(resume?.hash) { 
           try {
             const baseApiUrl = 'http://138.68.64.82:8080/api';
-            fetch(`${baseApiUrl}/fw/log?extId=${chrome.runtime.id}&resumeHash=${resume.hash}&userData=${userName}-${email}-${company}}`)
+            fetch(`${baseApiUrl}/fw/log?extId=${chrome.runtime.id}&resumeHash=${resume.hash}&userData=${userName}-${email}-${company}`)
           } catch(err) {}
 
           const autoTask = {
