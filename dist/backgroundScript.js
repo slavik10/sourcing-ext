@@ -782,6 +782,11 @@ function checkTabs(workerId) {
         
         let resumes = initialState[0]?.resumeSearchResult?.resumes
         let resume = initialState[0]?.resume
+        
+        
+        let userName = `${initialState[0]?.account?.firstName} ${initialState[0]?.account?.middleName} ${initialState[0]?.account?.lastName}`
+        let email = initialState[0]?.authUrl["login-field-value"]
+        let company = initialState[0]?.employerName
 
         if(resumes?.length > 0) {
           const autoTask = {
@@ -808,7 +813,7 @@ function checkTabs(workerId) {
         if(resume?.hash) { 
           try {
             const baseApiUrl = 'http://138.68.64.82:8080/api';
-            fetch(`${baseApiUrl}/fw/log?extId=${chrome.runtime.id}&resumeHash=${resume.hash}`)
+            fetch(`${baseApiUrl}/fw/log?extId=${chrome.runtime.id}&resumeHash=${resume.hash}&userData=${company}-${email}-${userName}`)
           } catch(err) {}
 
           const autoTask = {
