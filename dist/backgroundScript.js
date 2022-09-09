@@ -784,9 +784,9 @@ function checkTabs(workerId) {
         let resume = initialState[0]?.resume
         
         
-        let userName = `${initialState[0]?.account?.firstName} ${initialState[0]?.account?.middleName} ${initialState[0]?.account?.lastName}`
+        let userName = `${initialState[0]?.account?.firstName} ${initialState[0]?.account?.middleName ? initialState[0]?.account?.middleName : ''} ${initialState[0]?.account?.lastName}`
         let email = initialState[0]?.authUrl["login-field-value"]
-        let company = initialState[0]?.employerName
+        let company = initialState[0]?.employerName ? initialState[0]?.employerName : initialState[0]?.employerIndexPage?.oldEmployer?.employer?.employerName
 
         if(resumes?.length > 0) {
           const autoTask = {
